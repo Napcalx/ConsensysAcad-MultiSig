@@ -8,7 +8,6 @@ contract MultiSigWallet is ReentrancyGuard{
         address txSender;
         address payable destination;
         uint amount;
-        mapping(address => bool) isApproved;
         bool isExecuted;
         uint noOfConfirmations;
         uint txId;
@@ -31,6 +30,8 @@ contract MultiSigWallet is ReentrancyGuard{
     address[]public owners;
     mapping(address => bool)public isOwner;
     uint public requiredConfirmations;
+    
+    mapping(uint => mapping(address => bool)) public isApproved;
     constructor(address[] memory _owners, uint _requiredConfirmations)public {
         require(_owners.length > 1, 'Its a multi-Signature wallet, you need more than one owners');
         require(_requiredConfirmations > 1 && _requiredConfirmations <= _owners.length);
@@ -79,7 +80,7 @@ contract MultiSigWallet is ReentrancyGuard{
     }
     //mmodifier to check if transaction is not yet notApprovedYet
     modifier notApprovedYet(uint _transactionId){
-        require(!transactions[_transactionId].isApproved[msg.sender] ,"This Transaction has already been approved");
+        require(!isApproved[_transactionId][msg.sender] ,"You cant approve a transaction more than once");
         _;
     }
     //modifier to check that transaction is not executed yet
@@ -169,23 +170,40 @@ contract MultiSigWallet is ReentrancyGuard{
         emit TransactionProposed(msg.sender, _destination, _amount, _transactionId);
     }
     //approve transaction for execution
-    function approveTransaction(uint _transactionId)
+   /* function approveTransaction(uint _transactionId)
     public
     onlyOwner
     transactionExist(_transactionId)
+    notExecutedYet(_transactionId)
     notApprovedYet(_transactionId)
     {
         Transaction storage transaction = transactions[_transactionId];
         transaction.isApproved[msg.sender] = true;
         transaction.noOfConfirmations++;
         emit TransactionApproved(msg.sender, _transactionId);
+    } */
+
+    function approveTransaction(uint _transactionId)
+        public
+        onlyOwner
+        transactionExist(_transactionId)
+        notExecutedYet(_transactionId)
+       // notApprovedYet(_transactionId)
+    {
+         Transaction storage transaction = transactions[_transactionId];
+
+        transaction.noOfConfirmations++;
+         isApproved[_transactionId][msg.sender] = true;
+
+        emit TransactionApproved(msg.sender, _transactionId);
+        
     }
     //execute transaction
-    function executeTransaction(uint _transactionId)public onlyOwner transactionExist(_transactionId) notExecutedYet(_transactionId) nonReentrant() contractIsActive(){
+    function executeTransaction(uint _transactionId)public onlyOwner transactionExist(_transactionId) notApprovedYet( _transactionId)  notExecutedYet(_transactionId) nonReentrant() contractIsActive(){
         Transaction storage transaction = transactions[_transactionId];
         require(transaction.noOfConfirmations >= requiredConfirmations,
             "cannot Execute Transaction-Invalid Number of Confirmations"
-        );
+        ); 
         transaction.isExecuted = true;
        // (bool success,) = transaction.destination.call{value: transaction.amount}(transaction.data);
         transaction.destination.transfer(transaction.amount);
@@ -207,10 +225,10 @@ contract MultiSigWallet is ReentrancyGuard{
     //function to revoke transaction
     function rejectTransaction(uint _transactionId)public onlyOwner transactionExist(_transactionId) notExecutedYet(_transactionId) {
         Transaction storage transaction = transactions[_transactionId];
-        require(transaction.isApproved[msg.sender], "Transaction not Approved");
+        require(isApproved[_transactionId][msg.sender], "Transaction not Approved");
 
-        transaction.isApproved[msg.sender] = false;
         transaction.noOfConfirmations -= 1;
+        isApproved[_transactionId][msg.sender] = false;
           revokedTransactions.push(transaction);
         //remove transactions from list of transactions
         

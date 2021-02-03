@@ -25,7 +25,7 @@ class App extends Component {
     pendingTx: [],
     executedTx: [],
     revokedTx:[],
-    currentComponent: 'landing'
+    currentComponent: 'dashboard'
    };
 
   componentDidMount = async () => {
@@ -51,10 +51,10 @@ class App extends Component {
      
 
 
-      if(localStorage.length !== 0){
+   /*   if(localStorage.length !== 0){
         this.setUserWallet();
 
-      }
+      } */
 
         
     //  console.log(deployerAccount, 'deployer account');
@@ -76,11 +76,11 @@ class App extends Component {
       })
 
       // TO BE REMOVED
-     /* const contractAddress = "0xE91d3087ed78EE9F430EaaE5CD78F1418254b37D";
+     const contractAddress = "0x3cC60C1C77dc28F9063a167608546Ac2d4FDf120";
       
       this.setState({
         contractAddress
-      })
+      }) 
 
       const contract = new web3.eth.Contract(this.state.contractABI, this.state.contractAddress);
       this.setState({
@@ -99,8 +99,7 @@ class App extends Component {
         confirmations
       })
 
-      console.log(this.state.contract) */
-
+  
      // console.log(this.state.ownersArray, this.state.confirmations)
       //END OF PORTION TO BE SAVED
 
@@ -111,9 +110,10 @@ class App extends Component {
 
       this.setState({
         contractByteCode
-      })
-        //retrieve data from localStorage
+      }) 
     
+     // this.deployContract(ownersArray, confirmations);
+      
     } catch (error) {
       // Catch any errors for any of the above operations.
       alert(
@@ -126,7 +126,7 @@ class App extends Component {
   
 
 //RETRIEVE USERWALLET SAVED IN LOCAL STORAGE
-  setUserWallet = ()=> {
+ /* setUserWallet = ()=> {
     let localStorageAddress;
     let localStorageComponent;
     let contractInstance;
@@ -152,7 +152,7 @@ class App extends Component {
     
     
     console.log(this.state.contractAddress, this.state.currentComponent,this.state.contract, 'localStorage details')
-  }
+  } */
   //deploy contract function
   deployContract = async (ownersArray, confirmations)=>{
     this.setState({
@@ -198,7 +198,7 @@ class App extends Component {
 
     //SAVE CONTRACT DETAILS TO LOCAL STORAGE
 
-    const currentAdd = this.state.contractAddress;
+  /*  const currentAdd = this.state.contractAddress;
     const currentcomp = this.state.currentComponent;
     const currentContractInstance = this.state.contract;
     const stringedContract = JSON.stringify(currentContractInstance);
@@ -211,12 +211,14 @@ class App extends Component {
 
   
     
-    console.log(localStorage);
+    console.log(localStorage); */
   }
 
   //check contract balance
   contractBalanceHandler=async()=> {
-    const balance = await this.state.contract.methods.checkBalance().call();
+    const balance = await this.state.contract.methods.checkBalance().call({
+      from: this.state.currentAccount
+    })
     const contractBalance = await this.state.web3.utils.fromWei(balance, "ether");
     this.setState({
       contractBalance
@@ -276,8 +278,8 @@ class App extends Component {
     
      await this.state.contract.methods.approveTransaction(txId).send({
       from: this.state.currentAccount,
-      gas: 25000,
-      gasPrice: 0
+      gas: 70000,
+      
      });
 
      alert('one Confirmation added');
@@ -287,7 +289,7 @@ class App extends Component {
      try{
       await this.state.contract.methods.executeTransaction(txId).send({
         from: this.state.currentAccount,
-        gas: 25000,
+        gas: 1000000,
         gasPrice: 0
        });
    
@@ -358,3 +360,4 @@ class App extends Component {
 }
 
 export default App;
+

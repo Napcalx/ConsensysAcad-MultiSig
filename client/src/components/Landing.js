@@ -18,6 +18,7 @@ class Landing extends Component {
             ownersArray
         })
         
+        
     }
 
     handleNumConfirmations=(e)=> {
@@ -32,6 +33,8 @@ class Landing extends Component {
         e.preventDefault();
         this.props.deployContract(this.state.ownersArray, this.state.confirmations);
         this.props.changeCurrentComponent(e);
+
+        console.log(this.state.ownersArray)
     }
 
     render(){

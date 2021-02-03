@@ -306,9 +306,11 @@ button:focus{
 }
 
 .tx-table-div h3{
-  margin-left: 40%;
+  margin-left: 5%;
   margin-top: 1rem;
   font-size: 1.3rem !important;
+  text-align: center;
+  width: 100%;
   
 
 }
