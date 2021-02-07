@@ -2,12 +2,16 @@ import React from "react";
 import "../App.css";
 import { Table } from "react-bootstrap";
 
-const PendingTx =(props)=> {
+
+const PendingTx = (props)=> {
   
     const initials = props.pendingTx;
     const initialSolved = Object.values(initials);
     const transactions = []
     const transactionsList = []
+
+    
+    
 
     initialSolved.map(solved=> {
       transactions.push(solved)
@@ -20,14 +24,19 @@ const PendingTx =(props)=> {
       })
       
    })
+
+
+   
+   
+
     const renderPendingTx=transactionsList.map((transaction, key) => {
       //console.log(transactionsList.indexOf(transaction), 'key o')
-
+       
       return(
           <tr key={transaction[4]} className="tx-details">
               <td>{transaction[0].slice(0,4).concat('...').concat(transaction[0].slice(14,18)) }</td>
               <td>{transaction[1].slice(0,4).concat('...').concat(transaction[1].slice(14,18)) }</td>
-              <td>{transaction[2]} Eth</td>
+              <td>{transaction[2]/10**18} Eth</td>
               <td>{transaction[3]}</td>
               <td>{transaction[4]}</td>
               <td><button onClick={()=> {

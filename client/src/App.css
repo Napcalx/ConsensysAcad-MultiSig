@@ -82,13 +82,26 @@ input:focus{
   
   box-shadow: 0.03rem 0.03rem 0.4rem 0.15rem rgba(0,0,0, 0.5);
 }
+.top-nav button {
+  height: 100%;
+  width: auto;
+  margin-left: 10%;
+  border: none;
+  background-color:rgba(255, 0,0, 0.8);
+  color: rgba(255, 255, 255, 0.8);
+}
+.top-nav button:hover{
+  background-color:rgba(255, 0,0);
+  color: rgba(255, 255, 255);
+}
+
 .contractAddress-span{
   margin-left: auto;
   margin-right: 1rem;
   color: white;
 }
 .balance-span{
-  margin-left: 50%;
+  margin-left: 30%;
   color: white;
 }
 .balance{

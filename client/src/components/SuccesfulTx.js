@@ -30,7 +30,7 @@ const SuccessfulTx =(props)=> {
           <tr key={transaction[4]} className="tx-details">
               <td>{transaction[0].slice(0,4).concat('...').concat(transaction[0].slice(14,18)) }</td>
               <td>{transaction[1].slice(0,4).concat('...').concat(transaction[1].slice(14,18)) }</td>
-              <td>{transaction[2]} Eth</td>
+              <td>{transaction[2]/10**18} Eth</td>
               <td>{transaction[3]}</td>
               <td>{transaction[4]}</td> 
               <td> <img src="https://www.freeiconspng.com/thumbs/success-icon/success-icon-10.png" /></td>  

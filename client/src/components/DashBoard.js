@@ -52,6 +52,8 @@ class DashBoard extends Component {
     return (
       <div className="dashboard">
         <nav className="top-nav">
+          <button
+          onClick={this.props.freezeTxExecution}> Freeze TX Execution</button>
         <span className="balance-span">Balance: <span className="balance">{this.props.contractBalance} Ether</span></span>
         <span className="contractAddress-span">Wallet address: <span className="contractAddress">{this.props.contractAddress} </span></span>
       

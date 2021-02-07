@@ -25,7 +25,8 @@ class App extends Component {
     pendingTx: [],
     executedTx: [],
     revokedTx:[],
-    currentComponent: 'dashboard'
+    currentComponent: 'dashboard',
+    circuitBreaker: true
    };
 
   componentDidMount = async () => {
@@ -76,7 +77,7 @@ class App extends Component {
       })
 
       // TO BE REMOVED
-     const contractAddress = "0x3cC60C1C77dc28F9063a167608546Ac2d4FDf120";
+     const contractAddress = "0xBb37ae140936052b3F6907bad61cdEa47557D151";
       
       this.setState({
         contractAddress
@@ -88,8 +89,7 @@ class App extends Component {
       },
       this.contractBalanceHandler)
 
-      
-
+      //arrays of owners=> addresses from metamask
       const ownersArray = ["0x8B65121355e24943f1EE7cD9FdeB87b272527C4f", "0xC19795F48766EAfb68537690c6Eaa08E0884c64b", "0xB94737b1144667335A29c9C723245925aC3609bd"];
       this.setState({
         ownersArray
@@ -112,7 +112,7 @@ class App extends Component {
         contractByteCode
       }) 
     
-     // this.deployContract(ownersArray, confirmations);
+     //this.deployContract(ownersArray, confirmations);
       
     } catch (error) {
       // Catch any errors for any of the above operations.
@@ -264,6 +264,10 @@ class App extends Component {
 
   proposeTransactionHandler= async(recipientAddress, amount)=> {
     const convertedAmount = await this.state.web3.utils.toWei(amount.toString(), "ether");
+   // const convertedAmount = await this.state.web3.utils.fromWei(convertedAmount1, "ether");
+    console.log(convertedAmount, "C.A");
+   // console.log(convertedAmount1, "C.A1");
+    
      await this.state.contract.methods.proposeTransaction(
       recipientAddress, convertedAmount, '0x00'
     ).send({
@@ -315,14 +319,28 @@ class App extends Component {
   changeCurrentComponent = (e)=> {
     this.setState({
       currentComponent:'dashboard'
-    })
-
-    
-    
-    
-    
+    })    
   }
   
+  freezeTxExecution = async()=> {
+
+    try{
+      await this.state.contract.methods.toggleCircuitBreaker().send({
+        from:this.state.currentAccount
+      })
+
+      this.setState({
+        circuitBreaker: !this.state.circuitBreaker
+      })
+      alert("You have toggled Freeze-Executiom")
+
+      console.log(this.state.circuitBreaker, "toggled");
+
+    }catch(e){
+      console.log("error");
+    }
+    
+  }
 
   //0x8B65121355e24943f1EE7cD9FdeB87b272527C4f 0xC19795F48766EAfb68537690c6Eaa08E0884c64b 0xB94737b1144667335A29c9C723245925aC3609bd
 
@@ -347,7 +365,8 @@ class App extends Component {
       viewRevokedList={this.revokedTransactionsList}
       approveTx={this.approveTransaction}
       executeTx={this.executeTransaction}
-      revokeTx={this.revokeTransaction}/>
+      revokeTx={this.revokeTransaction}
+      freezeTxExecution={this.freezeTxExecution}/>
     }
     // 
     return (
